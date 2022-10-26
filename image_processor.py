@@ -20,6 +20,11 @@ class ImageProcessor:
         overlayed_image.save(self.overlayed_filename)
 
     def convert_to_ela(self, original_image, resaved_image, scale):
+        """
+        Takes original and resaved with compression image and return ELA image,
+        which is a difference between these two images.
+        """
+
         ela_image = ImageChops.difference(original_image, resaved_image)
         width, height = ela_image.size
         ela_pixel_image = ela_image.load()
@@ -29,4 +34,9 @@ class ImageProcessor:
         return ela_image
 
     def compress_image(self):
+        """
+        Implement in future
+        Compress image until it's size will be less than threshold
+        """
+
         pass
