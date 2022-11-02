@@ -1,6 +1,7 @@
 import aiogram
 from aiogram import Bot, Dispatcher, executor, types
 import os
+import shutil
 import logging
 import config
 from image_processor import ImageProcessor
@@ -15,7 +16,8 @@ class RecievedPhotoFile(types.Message):
 
     def __init__(self, message):
         self.photo_filename = message.date.strftime('%d%m%y_%H-%M-%S') + '.jpg'
-        self.photo_destination = f'users_photos/{message.from_user.username}_{message.from_user.id}/{self.photo_filename}'
+        self.username_path = f'users_photos/{message.from_user.username}_{message.from_user.id}'
+        self.photo_destination = f'{self.username_path}/{self.photo_filename}'
 
 
 @dp.message_handler(commands=['start'])
@@ -73,6 +75,12 @@ async def photo_analysis(message: types.Message):
 
     await send_photo_or_file(message.from_user.id, image_processor.overlayed_filename,
                              additional_text='Original image with ELA map')
+
+    if config.delete_user_photos_on_finish:
+        try:
+            shutil.rmtree(photo_file.username_path)
+        except OSError as err:
+            logging.info(f'"Error: {err.filename}, {err.strerror}')
 
 
 async def send_photo_or_file(user_id, photo_path, additional_text=None):
